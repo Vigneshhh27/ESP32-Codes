@@ -1,2 +1,2 @@
 # ESP32-Codes
- ESP32 codes in .c and .cpp for various tasks
+ ESP32 codes in .c and .cpp for various IOT tasks
