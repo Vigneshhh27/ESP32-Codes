@@ -58,6 +58,34 @@ String requestSlaveData(String command) {
   return response;
 }
 
+
+
+// Define the PIR sensor pin and initialize the motion count
+
+int Motion_count = 0;
+
+// Function to check the PIR sensor for 10 seconds
+void checkMotionFor10Seconds() {
+  unsigned long startTime = millis();  // record the start time
+
+  // Loop for 10,000 milliseconds (10 seconds)
+  while (millis() - startTime < 10000) {
+    //int pir_value = digitalRead(PIR_PIN);  // Read the PIR sensor value
+    String slaveData2 = "";
+    slaveData2 = requestSlaveData("pir");
+    Serial.print("Motion = ");
+    Serial.println(slaveData2);
+
+    // If motion is detected (HIGH), print a message and increment the count
+   // if (pir_value == HIGH) {
+   //   Serial.println("Motion detected!");
+   //   Motion_count++;
+   // }
+    
+    delay(1000);  // Wait 1 second before checking again
+  }
+}
+
 // BLE callback for when the input characteristic is written
 class InputReceivedCallbacks: public BLECharacteristicCallbacks {
   void onWrite(BLECharacteristic *pCharacteristic) {
@@ -74,6 +102,13 @@ class InputReceivedCallbacks: public BLECharacteristicCallbacks {
       slaveData = requestSlaveData("blue");
     } else if (value.equalsIgnoreCase("green")) {
       slaveData = requestSlaveData("green");
+    } else if (value.equalsIgnoreCase("motion")) {
+      checkMotionFor10Seconds();
+      
+    } else if (value.equalsIgnoreCase("EM1_ON")) {
+      slaveData = requestSlaveData("EM1_ON");
+    } else if (value.equalsIgnoreCase("EM1_OFF")) {
+      slaveData = requestSlaveData("EM1_OFF");
     } else {
       Serial.println("Invalid command received via BLE");
       return;
@@ -127,15 +162,24 @@ void initBLE() {
   Serial.println("BLE Initialized and Advertising");
 }
 
+
+
+
 void setup() {
   Serial.begin(115200);
   // Initialize I2C as master.
   Wire.begin();
   // Initialize BLE.
   initBLE();
+
+ 
+
 }
 
 void loop() {
   // The main loop does nothing; BLE callback triggers I2C requests when data is written.
+
+
+
   delay(1000);
 }
